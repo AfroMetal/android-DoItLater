@@ -1,8 +1,6 @@
 package com.afrometal.radoslaw.bicycleviewer;
 
-
 import android.content.res.TypedArray;
-import android.support.annotation.Nullable;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,32 +11,26 @@ import android.widget.ImageView;
 public class PhotoFragment extends Fragment {
     final static String ARG_POSITION = "position";
     int mCurrentPosition = -1;
-    ImageView photo;
+    TouchImageView photo;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         if (savedInstanceState != null) {
             mCurrentPosition = savedInstanceState.getInt(ARG_POSITION, -1);
-//            updatePhotoView(mCurrentPosition);
         }
-
         View v = inflater.inflate(R.layout.photo_view, container, false);
-        photo = (ImageView) v.findViewById(R.id.imageview_photo);
+        photo = (TouchImageView) v.findViewById(R.id.imageview_photo);
         return v;
     }
 
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        if (savedInstanceState != null) {
-//            updatePhotoView(savedInstanceState.getInt(ARG_POSITION));
-//        } else {
-//            Bundle bundle = getArguments();
-//            updatePhotoView(bundle.getInt(ARG_POSITION));
-//        }
-//    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            updatePhotoView(savedInstanceState.getInt(ARG_POSITION, -1));
+        }
+    }
 
     @Override
     public void onStart() {
@@ -51,7 +43,7 @@ public class PhotoFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             // Set article based on argument passed in
-            updatePhotoView(args.getInt(ARG_POSITION));
+            updatePhotoView(args.getInt(ARG_POSITION, -1));
         } else if (mCurrentPosition != -1) {
             // Set article based on saved instance state defined during onCreateView
             updatePhotoView(mCurrentPosition);
@@ -60,10 +52,12 @@ public class PhotoFragment extends Fragment {
 
     public void updatePhotoView(int position) {
 //        ImageView photo = (ImageView) getView().findViewById(R.id.imageview_photo);
-        TypedArray imgs = getResources().obtainTypedArray(R.array.photos);
-        photo.setImageResource(imgs.getResourceId(position, 0));
-        imgs.recycle();
-        mCurrentPosition = position;
+        if (position != -1) {
+            TypedArray imgs = getResources().obtainTypedArray(R.array.photos);
+            photo.setImageResource(imgs.getResourceId(position, -1));
+            imgs.recycle();
+            mCurrentPosition = position;
+        }
     }
 
     @Override

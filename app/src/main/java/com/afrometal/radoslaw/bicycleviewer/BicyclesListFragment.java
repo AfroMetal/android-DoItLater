@@ -4,10 +4,8 @@ package com.afrometal.radoslaw.bicycleviewer;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class BicyclesListFragment extends ListFragment {
@@ -23,11 +21,8 @@ public class BicyclesListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // We need to use a different list item layout for devices older than Honeycomb
-        int layout = android.R.layout.simple_list_item_activated_1;
-
         // Create an array adapter for the list view, using the Ipsum headlines array
-        setListAdapter(new ArrayAdapter<>(getActivity(), layout, getResources().getStringArray(R.array.titles)));
+        setListAdapter(new MyArrayAdapter(getActivity(), getResources().getStringArray(R.array.titles)));
     }
 
     @Override
