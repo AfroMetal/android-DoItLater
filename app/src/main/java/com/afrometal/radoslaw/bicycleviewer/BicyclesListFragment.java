@@ -1,20 +1,71 @@
 package com.afrometal.radoslaw.bicycleviewer;
 
-
-import android.app.ListFragment;
+import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
-public class BicyclesListFragment extends ListFragment {
+import org.w3c.dom.Text;
 
-    OnBicycleSelectedListener mCallback;
 
-    // The container Activity must implement this interface so the frag can deliver messages
+public class BicyclesListFragment extends ListFragment implements OnItemClickListener {
+    // The list adapter for the list we are displaying
+    MyArrayAdapter mListAdapter;
+
+    // The listener we are to notify when a headline is selected
+    OnBicycleSelectedListener mBicycleSelectedListener = null;
+
+    public void setRating(int position, float rating) {
+//        View view  = mListAdapter.getView(position, null, null);
+        Log.d("setRating:", "rating: " + rating + "\t" + "position: " + position);
+//        TextView tv = (TextView) view.findViewWithTag(getActivity().getResources().getString(R.string.ratingData)+position);
+
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putFloat(getActivity().getResources().getString(R.string.ratingData)+position, rating);
+        editor.commit();
+
+        if (((MainActivity)getActivity()).mIsDualPane) {
+            Activity act = getActivity();
+            SharedPreferences data = act.getPreferences(Context.MODE_PRIVATE);
+            mListAdapter.data = data;
+//                mListAdapter = new MyArrayAdapter(act, titles, data);
+//                setListAdapter(mListAdapter);
+            mListAdapter.notifyDataSetChanged();
+        }
+
+//        Activity act = getActivity();
+//        SharedPreferences data = act.getPreferences(Context.MODE_PRIVATE);
+//        String[] titles = getResources().getStringArray(R.array.titles);
+//
+//        mListAdapter = new MyArrayAdapter(act, titles, data);
+    }
+
     public interface OnBicycleSelectedListener {
-        void onPhotoSelected(int position);
+        void onPhotoSelected(int position, String title, float rating);
+    }
+
+    /**
+     * Default constructor required by framework.
+     */
+    public BicyclesListFragment() {
+        super();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        setListAdapter(mListAdapter);
+
+        getListView().setSelector(R.drawable.selector);
+        getListView().setOnItemClickListener(this);
     }
 
     @Override
@@ -22,47 +73,68 @@ public class BicyclesListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         // Create an array adapter for the list view, using the Ipsum headlines array
-        setListAdapter(new MyArrayAdapter(getActivity(), getResources().getStringArray(R.array.titles)));
+        Activity act = getActivity();
+        SharedPreferences data = act.getPreferences(Context.MODE_PRIVATE);
+        String[] titles = getResources().getStringArray(R.array.titles);
+
+        mListAdapter = new MyArrayAdapter(act, titles, data);
     }
 
+
     @Override
-    public void onStart() {
-        super.onStart();
-        // When in two-pane layout, set the listview to highlight the selected list item
-        // (We do this during onStart because at the point the listview is available.)
-        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        } else {
-            getListView().setChoiceMode(ListView.CHOICE_MODE_NONE);
+    public void onStop() {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        String prefix = getActivity().getResources().getString(R.string.ratingData);
+
+        for (int i=0; i<mListAdapter.getCount(); i++) {
+            View view  = mListAdapter.getView(i, null, null);
+            float rating = Float.parseFloat(((TextView)view.findViewById(R.id.secondLine)).getText().toString());
+            editor.putFloat(prefix+i, rating);
+        }
+
+        editor.commit();
+
+        super.onStop();
+    }
+    /**
+     * Sets the listener that should be notified of headline selection events.
+     * @param listener the listener to notify.
+     */
+    public void setOnBicycleSelectedListener(OnBicycleSelectedListener listener) {
+        mBicycleSelectedListener = listener;
+    }
+
+    /**
+     * Handles a click on a headline.
+     *
+     * This causes the configured listener to be notified that a headline was selected.
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String title = ((TextView)view.findViewById(R.id.firstLine)).getText().toString();
+        float rating = Float.parseFloat(((TextView)view.findViewById(R.id.secondLine)).getText().toString()); //TODO: get rating from view or memory
+        if (null != mBicycleSelectedListener) {
+            mBicycleSelectedListener.onPhotoSelected(position, title, rating);
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception.
-        try {
-            mCallback = (OnBicycleSelectedListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnHeadlineSelectedListener");
+    /** Sets choice mode for the list
+     *
+     * @param selectable whether list is to be selectable.
+     */
+    public void setSelectable(boolean selectable) {
+        if (selectable) {
+            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        }
+        else {
+            getListView().setChoiceMode(ListView.CHOICE_MODE_NONE);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mCallback = null;
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        // Notify the parent activity of selected item
-        mCallback.onPhotoSelected(position);
-
-        // Set the item as checked to be highlighted when in two-pane layout
-        getListView().setItemChecked(position, true);
+        mBicycleSelectedListener = null;
     }
 }

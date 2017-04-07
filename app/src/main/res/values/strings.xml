@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">BicycleViewer</string>
+    <string name="ratingData">ratingForBike</string>
     <string-array name="titles">
         <item>Aaron\'s Rosko Cross</item>
         <item>TVT Lemond with Campagnolo Record</item>
