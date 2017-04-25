@@ -1,18 +1,4 @@
 <resources>
-    <string name="app_name">BicycleViewer</string>
+    <string name="app_name">Do It Later</string>
     <string name="ratingData">ratingForBike</string>
-    <string-array name="titles">
-        <item>Aaron\'s Rosko Cross</item>
-        <item>TVT Lemond with Campagnolo Record</item>
-        <item>Bottecchia Road with Campagnolo</item>
-        <item>Colins Stinner Frameworks Cross Bike</item>
-        <item>Doug Zell Founders FOUNDER</item>
-    </string-array>
-    <integer-array name="photos">
-        <item>@drawable/aarons_rosko_cross</item>
-        <item>@drawable/a_shifter_bikes_ttv_lemond_with_c_record</item>
-        <item>@drawable/bottecchia_road_with_campagnolo</item>
-        <item>@drawable/colins_stinner_frameworks_cross_bike</item>
-        <item>@drawable/doug_zell_founders_founder</item>
-    </integer-array>
 </resources>

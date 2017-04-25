@@ -1,4 +1,4 @@
-package com.afrometal.radoslaw.bicycleviewer;
+package com.afrometal.radoslaw.doitlater;
 
 import org.junit.Test;
 

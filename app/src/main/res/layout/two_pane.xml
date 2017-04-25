@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment android:name="com.afrometal.radoslaw.bicycleviewer.BicyclesListFragment"
+    <fragment android:name="com.afrometal.radoslaw.doitlater.ToDoListFragment"
         android:id="@+id/list_fragment"
         android:layout_weight="2"
         android:layout_width="0dp"
@@ -14,11 +14,11 @@
         android:layout_height="match_parent"
         tools:layout="@layout/simple_list_item_activated_1" />
 
-    <fragment android:name="com.afrometal.radoslaw.bicycleviewer.PhotoFragment"
-        android:id="@+id/photo_fragment"
+    <fragment android:name="com.afrometal.radoslaw.doitlater.DetailsFragment"
+        android:id="@+id/details_fragment"
         android:layout_weight="3"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        tools:layout="@layout/photo_view"/>
+        tools:layout="@layout/details_view"/>
 
 </LinearLayout>

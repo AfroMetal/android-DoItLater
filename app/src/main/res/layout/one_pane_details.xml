@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment android:name="com.afrometal.radoslaw.bicycleviewer.PhotoFragment"
-        android:id="@+id/photo_fragment"
+    <fragment android:name="com.afrometal.radoslaw.doitlater.DetailsFragment"
+        android:id="@+id/details_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/photo_view"/>
+        tools:layout="@layout/details_view"/>
 
 </LinearLayout>

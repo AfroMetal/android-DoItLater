@@ -1,4 +1,4 @@
-package com.afrometal.radoslaw.bicycleviewer;
+package com.afrometal.radoslaw.doitlater;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.afrometal.radoslaw.bicycleviewer", appContext.getPackageName());
+        assertEquals("com.afrometal.radoslaw.doitlater", appContext.getPackageName());
     }
 }

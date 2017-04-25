@@ -1,7 +1,6 @@
-package com.afrometal.radoslaw.bicycleviewer;
+package com.afrometal.radoslaw.doitlater;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -11,13 +10,13 @@ import android.widget.RatingBar;
  * Created by radoslaw on 06.04.17.
  */
 
-public class PhotoActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity {
     // The fragment where the article is displayed (null if absent)
-    private PhotoFragment mPhotoFragment;
+    private DetailsFragment mDetailsFragment;
     // The news category index and the article index for the article we are to display
-    private int mPhotoIndex;
-    private String mPhotoTitle;
-    private float mPhotoRating;
+    private int mToDoIndex;
+    private String mToDoTitle;
+    private String mToDoDetails;
 
     /**
      * Sets up the activity.
@@ -36,31 +35,22 @@ public class PhotoActivity extends AppCompatActivity {
             return;
         }
 
-        setContentView(R.layout.one_pane_photo);
+        setContentView(R.layout.one_pane_details);
 
         Intent intent = getIntent();
         Bundle args = intent.getExtras();
 
-        mPhotoIndex = args.getInt("photoIndex", -1);
-        mPhotoTitle = args.getString("photoTitle", "");
-        mPhotoRating = args.getFloat("photoRating", 0);
+        //TODO: save args to fields
 
-        mPhotoFragment = (PhotoFragment) getSupportFragmentManager().findFragmentById(
-                R.id.photo_fragment);
+        mDetailsFragment = (DetailsFragment) getSupportFragmentManager().findFragmentById(
+                R.id.details_fragment);
         // Place an ArticleFragment as our content pane
-//        PhotoFragment f = new PhotoFragment();
-//        getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
+        DetailsFragment f = new DetailsFragment();
+        getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
 
         // Display the correct news article on the fragment
 
-        mPhotoFragment.updatePhotoView(mPhotoIndex, mPhotoTitle, mPhotoRating);
-        RatingBar mRatingBar = (RatingBar) findViewById(R.id.rating_bar);
-        mRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                mPhotoRating = rating;
-            }
-        });
+        mDetailsFragment.updateDetailsView(mToDoIndex, mToDoTitle, mToDoDetails);
     }
 
     @Override
@@ -88,8 +78,7 @@ public class PhotoActivity extends AppCompatActivity {
 
     private void sendResult() {
         Intent intent = new Intent((String) null);
-        intent.putExtra("position", mPhotoIndex);
-        intent.putExtra("rating", mPhotoRating);
+        //TODO: put data
         setResult(RESULT_OK, intent);
         finish();
     }
