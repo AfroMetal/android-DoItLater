@@ -2,14 +2,20 @@ package com.afrometal.radoslaw.doitlater;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class DetailsFragment extends Fragment {
-    private TextView mDetailsTextView;
+    protected EditText mTitleTextView;
+    protected EditText mDetailsTextView;
+    protected Button mSaveButton;
     public DetailsFragment() {
         super();
     }
@@ -19,17 +25,17 @@ public class DetailsFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        mDetailsTextView = new TouchImageView(getActivity());
-//        updateDetailsView(0);
-//        mDetailsTextView = new ImageView(getActivity());
         View mView = inflater.inflate(R.layout.details_view, container, false);
-        mDetailsTextView = (TextView) mView.findViewById(R.id.details_textview);
+        mTitleTextView = (EditText)  mView.findViewById(R.id.title_textview);
+        mDetailsTextView = (EditText) mView.findViewById(R.id.details_textview);
+        mSaveButton = (Button) mView.findViewById(R.id.save_button);
 
         return mView;
     }
 
-    public void updateDetailsView(int photo, String title, String details) {
-        //TODO: fckin update it
+    public void updateDetailsView(String title, String details) {
+        mTitleTextView.setText(title);
+        mDetailsTextView.setText(details);
     }
 
     @Override

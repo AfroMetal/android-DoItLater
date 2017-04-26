@@ -1,27 +1,37 @@
 package com.afrometal.radoslaw.doitlater;
 
 import android.app.Activity;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
-public class ToDoListFragment extends ListFragment implements OnItemClickListener {
+public class ToDoListFragment extends ListFragment implements OnItemClickListener, AdapterView.OnItemLongClickListener {
     // The list adapter for the list we are displaying
     MyArrayAdapter mListAdapter;
     ListView mListView;
+    FloatingActionButton mButton;
 
     // The listener we are to notify when a headline is selected
     OnToDoItemSelectedListener mToDoItemSelectedListener = null;
 
     public interface OnToDoItemSelectedListener {
-        void onToDoItemSelected(int position);
+        void onToDoItemSelected(Long index, @Nullable int position);
     }
 
     /**
@@ -34,16 +44,32 @@ public class ToDoListFragment extends ListFragment implements OnItemClickListene
     @Override
     public void onStart() {
         super.onStart();
+
         setListAdapter(mListAdapter);
 
         getListView().setSelector(R.drawable.selector);
         getListView().setOnItemClickListener(this);
+        getListView().setOnItemLongClickListener(this);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        registerForContextMenu(getListView());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.list_view, container, false);
         mListView = (ListView) mView.findViewById(android.R.id.list);
+        mButton = (FloatingActionButton) mView.findViewById(R.id.add_fab);
+
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).onToDoItemSelected(-1l, -1);
+            }
+        });
 
         mListView.setAdapter(mListAdapter);
         return mView;
@@ -55,14 +81,45 @@ public class ToDoListFragment extends ListFragment implements OnItemClickListene
 
         // Create an array adapter for the list view, using the Ipsum headlines array
         Activity act = getActivity();
-        //TODO: get titles from database, with first liners
-        String[] titles = {"Title1", "Title2", "Title3", "Title1", "Title2", "Title3", "Title1", "Title2", "Title3", "Title1", "Title2", "Title3"};
-        String[] shorts = {"Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!",
-                "Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!",
-                "Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!",
-                "Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!"};
 
-        mListAdapter = new MyArrayAdapter(act, titles, shorts);
+        String[] projection = {
+                ToDoContract.ToDoEntry._ID,
+                ToDoContract.ToDoEntry.COLUMN_NAME_TITLE,
+                ToDoContract.ToDoEntry.COLUMN_NAME_DATE
+        };
+
+        String sortOrder =
+                ToDoContract.ToDoEntry.COLUMN_NAME_DATE + " DESC";
+
+        SQLiteDatabase db = ((MainActivity) getActivity()).mDbHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                ToDoContract.ToDoEntry.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        ArrayList<ToDoListItem> items = new ArrayList<>();
+
+        while(cursor.moveToNext()) {
+            long itemId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry._ID));
+            String itemTitle = cursor.getString(
+                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE));
+            String itemDate = cursor.getString(
+                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_DATE));
+
+            items.add(new ToDoListItem(itemId, itemTitle, itemDate));
+        }
+        cursor.close();
+
+        mListAdapter = new MyArrayAdapter(act, items);
+
+
     }
 
     /**
@@ -81,8 +138,29 @@ public class ToDoListFragment extends ListFragment implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mToDoItemSelectedListener) {
-            mToDoItemSelectedListener.onToDoItemSelected(position);
+            mToDoItemSelectedListener.onToDoItemSelected((Long) view.getTag(), position);
         }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d("long", "enter");
+        Long index = (Long) view.getTag();
+
+        // Define 'where' part of query.
+        String selection = ToDoContract.ToDoEntry._ID + " = ?";
+        // Specify arguments in placeholder order.
+        String[] selectionArgs = { index.toString() };
+        // Issue SQL statement.
+        SQLiteDatabase db = ((MainActivity) getActivity()).mDbHelper.getWritableDatabase();
+
+        db.delete(ToDoContract.ToDoEntry.TABLE_NAME, selection, selectionArgs);
+
+        mListAdapter.removeView(position);
+
+        Toast.makeText(getActivity(), "'" + ((TextView) view.findViewById(R.id.firstLine)).getText().toString() + "' was deleted", Toast.LENGTH_SHORT).show();
+
+        return true;
     }
 
     /** Sets choice mode for the list
