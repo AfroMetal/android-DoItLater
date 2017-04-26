@@ -7,17 +7,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class MyArrayAdapter extends ArrayAdapter<String> {
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
+
+public class MyArrayAdapter extends ArrayAdapter<ToDoListItem> {
     private final Context context;
-    private final String[] titles;
-    private final String[] shorts;
     private LayoutInflater inflater;
 
-    public MyArrayAdapter(Context context, String[] titles, String[] shorts) {
-        super(context, -1, titles);
+    public MyArrayAdapter(Context context, ArrayList<ToDoListItem> items) {
+        super(context, -1, items);
         this.context = context;
-        this.titles = titles;
-        this.shorts = shorts;
 
         inflater = LayoutInflater.from(context);
     }
@@ -29,11 +30,42 @@ public class MyArrayAdapter extends ArrayAdapter<String> {
         }
 
         TextView textView = (TextView) rowView.findViewById(R.id.firstLine);
-        TextView shortView = (TextView) rowView.findViewById(R.id.secondLine);
+        TextView dateView = (TextView) rowView.findViewById(R.id.date);
 
-        textView.setText(titles[position]);
-        shortView.setText(shorts[position]);
+        ToDoListItem item = this.getItem(position);
+
+        rowView.setTag(item.id);
+        textView.setText(item.title);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm MM/dd/yyyy");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Long.parseLong(item.date));
+        dateView.setText(sdf.format(calendar.getTime()));
 
         return rowView;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        setNotifyOnChange(false);
+        super.sort(new Comparator<ToDoListItem>() {
+            @Override
+            public int compare(ToDoListItem item1, ToDoListItem item2) {
+                return item1.date.compareTo(item2.date) * -1;
+            }
+        });
+        super.notifyDataSetChanged();
+    }
+
+    public void editView(Long id, String title, String date, int position) {
+        this.remove(this.getItem(position));
+        this.insert(new ToDoListItem(id, title, date), position);
+    }
+
+    public void addView(Long id, String title, String date) {
+        this.add(new ToDoListItem(id, title, date));
+    }
+
+    public void removeView(int position) {
+        this.remove(this.getItem(position));
     }
 }
