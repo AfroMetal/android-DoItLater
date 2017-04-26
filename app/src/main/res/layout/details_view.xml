@@ -2,19 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true" >
     <EditText
+        android:id="@+id/title_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Title"
         android:maxLines="1"
         android:textStyle="bold"
         android:layout_margin="8dp"
-        android:inputType="text|textCapSentences"/>
+        android:autoLink="none"
+        android:inputType="text|textCapSentences" />
     <EditText
         android:id="@+id/details_textview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:hint="Details"
         android:filterTouchesWhenObscured="true"
         android:autoLink="all"
@@ -22,9 +27,15 @@
         android:inputType="textMultiLine|textAutoComplete|textCapSentences"
         android:breakStrategy="high_quality"
         android:gravity="top"
-        android:imeOptions="actionDone"
+        android:imeOptions="actionSend"
         android:imeActionLabel="@string/save"
-        android:enabled="true"
         android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"/>
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="@string/save"/>
 </LinearLayout>
