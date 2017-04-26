@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Title"
+        android:maxLines="1"
+        android:textStyle="bold"
+        android:layout_margin="8dp"
+        android:inputType="text|textCapSentences"/>
+    <EditText
         android:id="@+id/details_textview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</FrameLayout>
+        android:layout_height="match_parent"
+        android:hint="Details"
+        android:filterTouchesWhenObscured="true"
+        android:autoLink="all"
+        android:linksClickable="false"
+        android:inputType="textMultiLine|textAutoComplete|textCapSentences"
+        android:breakStrategy="high_quality"
+        android:gravity="top"
+        android:imeOptions="actionDone"
+        android:imeActionLabel="@string/save"
+        android:enabled="true"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"/>
+</LinearLayout>

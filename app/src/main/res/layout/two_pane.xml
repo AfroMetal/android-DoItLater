@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         app:elevation="6dp"
         android:layout_height="match_parent"
-        tools:layout="@layout/simple_list_item_activated_1" />
+        tools:layout="@layout/list_view" />
 
     <fragment android:name="com.afrometal.radoslaw.doitlater.DetailsFragment"
         android:id="@+id/details_fragment"

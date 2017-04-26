@@ -1,21 +1,21 @@
 package com.afrometal.radoslaw.doitlater;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 
 public class ToDoListFragment extends ListFragment implements OnItemClickListener {
     // The list adapter for the list we are displaying
     MyArrayAdapter mListAdapter;
+    ListView mListView;
 
     // The listener we are to notify when a headline is selected
     OnToDoItemSelectedListener mToDoItemSelectedListener = null;
@@ -41,14 +41,26 @@ public class ToDoListFragment extends ListFragment implements OnItemClickListene
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View mView = inflater.inflate(R.layout.list_view, container, false);
+        mListView = (ListView) mView.findViewById(android.R.id.list);
+
+        mListView.setAdapter(mListAdapter);
+        return mView;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Create an array adapter for the list view, using the Ipsum headlines array
         Activity act = getActivity();
         //TODO: get titles from database, with first liners
-        String[] titles = {"Title1", "Title2", "Title3"};
-        String[] shorts = {"Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!"};
+        String[] titles = {"Title1", "Title2", "Title3", "Title1", "Title2", "Title3", "Title1", "Title2", "Title3", "Title1", "Title2", "Title3"};
+        String[] shorts = {"Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!",
+                "Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!",
+                "Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!",
+                "Lorem ipsum dolor", "Ala ma kota a kot ma ale, ale kot nie ma myszy", "Praise the lord!"};
 
         mListAdapter = new MyArrayAdapter(act, titles, shorts);
     }

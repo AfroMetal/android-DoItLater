@@ -5,4 +5,5 @@
     <color name="colorAccent">#009688</color>
     <color name="whiteTitle">#eeeeee</color>
     <color name="transparent">#55000000</color>
+    <color name="colorBlack">#111111</color>
 </resources>
