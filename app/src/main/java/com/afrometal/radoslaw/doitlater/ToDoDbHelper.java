@@ -1,5 +1,6 @@
 package com.afrometal.radoslaw.doitlater;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -31,5 +32,38 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public long insert(String title, String details) {
+        long time = System.currentTimeMillis();
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues(3);
+        values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DATE, time);
+        values.put(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE, title);
+        values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DETAILS, details);
+
+        return db.insert(ToDoContract.ToDoEntry.TABLE_NAME, null, values);
+    }
+
+    public int update(Long id, String title, String details) {
+        long time = System.currentTimeMillis();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        ContentValues values = new ContentValues(3);
+        values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DATE, time);
+        values.put(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE, title);
+        values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DETAILS, details);
+
+        String selection = ToDoContract.ToDoEntry._ID + " = ?";
+        String[] selectionArgs = { id.toString() };
+
+        return db.update(
+                ToDoContract.ToDoEntry.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
     }
 }

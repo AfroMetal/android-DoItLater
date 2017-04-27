@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by radoslaw on 06.04.17.
@@ -21,6 +22,7 @@ public class DetailsActivity extends AppCompatActivity {
     private Long mToDoIndex;
     private String mTitle;
     private String mDetails;
+    private Boolean mRestored;
 
     /**
      * Sets up the activity.
@@ -46,6 +48,7 @@ public class DetailsActivity extends AppCompatActivity {
         mToDoIndex = args.getLong("itemIndex");
         mTitle = args.getString("itemTitle");
         mDetails = args.getString("itemDetails");
+        mRestored = args.getBoolean("restored", false);
 
         mDetailsFragment = (DetailsFragment) getSupportFragmentManager().findFragmentById(
                 R.id.details_fragment);
@@ -66,7 +69,12 @@ public class DetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        sendResult();
+        Intent intent = new Intent((String) null);
+        intent.putExtra("itemIndex", mToDoIndex);
+        intent.putExtra("itemTitle", mDetailsFragment.mTitleTextView.getText().toString());
+        intent.putExtra("itemDetails", mDetailsFragment.mDetailsTextView.getText().toString());
+        setResult(RESULT_FIRST_USER + 0, intent);
+        finish();
         super.onStop();
     }
 
@@ -88,11 +96,20 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void sendResult() {
+        String title = mDetailsFragment.mTitleTextView.getText().toString();
+        String details = mDetailsFragment.mDetailsTextView.getText().toString();
+
         Intent intent = new Intent((String) null);
         intent.putExtra("itemIndex", mToDoIndex);
-        intent.putExtra("itemTitle", mDetailsFragment.mTitleTextView.getText().toString());
-        intent.putExtra("itemDetails", mDetailsFragment.mDetailsTextView.getText().toString());
-        setResult(RESULT_OK, intent);
+        intent.putExtra("itemTitle", title);
+        intent.putExtra("itemDetails", details);
+
+        if (title.equals(mTitle) && details.equals(mDetails) && !mRestored) {
+            setResult(RESULT_CANCELED, intent);
+        } else {
+            setResult(RESULT_OK, intent);
+        }
+
         finish();
     }
 }

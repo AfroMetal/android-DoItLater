@@ -97,12 +97,13 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
             if (mIsDualPane) {
                 // display it on the article fragment
                 mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDetails);
-            } else {
+            } else if (!mToDoTitle.isEmpty() && ! mToDoDetails.isEmpty()){
                 // use separate activity
                 Intent intent = new Intent(this, DetailsActivity.class);
                 intent.putExtra("itemIndex", mToDoIndex);
                 intent.putExtra("itemTitle", mToDoTitle);
                 intent.putExtra("itemDetails", mToDoDetails);
+                intent.putExtra("restored", true);
                 startActivityForResult(intent, 1);
             }
         }
@@ -182,12 +183,16 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                Long index = data.getLongExtra("itemIndex", -2);
-                String title = data.getStringExtra("itemTitle");
-                String details = data.getStringExtra("itemDetails");
+            if (resultCode == RESULT_OK || resultCode == RESULT_FIRST_USER + 0) {
+                mToDoIndex = data.getLongExtra("itemIndex", -2);
+                mToDoTitle = data.getStringExtra("itemTitle");
+                mToDoDetails = data.getStringExtra("itemDetails");
 
-                saveData(index, title, details);
+                if (resultCode == RESULT_OK) {
+                    saveData(mToDoIndex, mToDoTitle, mToDoDetails);
+                } else {
+                    mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDetails);
+                }
             }
         }
     }
@@ -198,56 +203,32 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
         } else if (title.isEmpty()) {
             title = details.split(" ", 2)[0];
         }
-
         if (index == -1) {
-            // Gets the data repository in write mode
-            SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-            // Create a new map of values, where column names are the keys
-            long time = System.currentTimeMillis();
-            ContentValues values = new ContentValues(3);
-            values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DATE, time);
-            values.put(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE, title);
-            values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DETAILS, details);
-
-            // Insert the new row, returning the primary key value of the new row
-            mToDoIndex = db.insert(ToDoContract.ToDoEntry.TABLE_NAME, null, values);
+            mToDoIndex = mDbHelper.insert(title, details);
             mToDoTitle = title;
             mToDoDetails = details;
 
-            mToDoListFragment.mListAdapter.addView(mToDoIndex, mToDoTitle, ((Long) time).toString());
+            mToDoListFragment.mListAdapter.addView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString());
+            Toast.makeText(this, "Note '" + title + "' saved", Toast.LENGTH_SHORT).show();
         } else if (index >= 0) {
-            SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-            // New value for one column
-            long time = System.currentTimeMillis();
-            ContentValues values = new ContentValues(3);
-            values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DATE, time);
-            values.put(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE, title);
-            values.put(ToDoContract.ToDoEntry.COLUMN_NAME_DETAILS, details);
-
-            // Which row to update, based on the title
-            String selection = ToDoContract.ToDoEntry._ID + " = ?";
-            String[] selectionArgs = { index.toString() };
-
-            int count = db.update(
-                    ToDoContract.ToDoEntry.TABLE_NAME,
-                    values,
-                    selection,
-                    selectionArgs);
+            int count = mDbHelper.update(index, title, details);
 
             mToDoIndex = index;
             mToDoTitle = title;
             mToDoDetails = details;
 
             if (count > 0) {
-                mToDoListFragment.mListAdapter.editView(mToDoIndex, mToDoTitle, ((Long) time).toString(), mAdapterPosition);
+                mToDoListFragment.mListAdapter.editView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), mAdapterPosition);
+                Toast.makeText(this, "Note '" + title + "' edited", Toast.LENGTH_SHORT).show();
             }
         } else {
+            mDetailsFragment.updateDetailsView("", "");
             return;
         }
 
-        Toast.makeText(this, "Note '" + title + "' saved", Toast.LENGTH_SHORT).show();
+        if (mIsDualPane) {
+            onToDoItemSelected(-1L, -1);
+        }
     }
 
     @Override
