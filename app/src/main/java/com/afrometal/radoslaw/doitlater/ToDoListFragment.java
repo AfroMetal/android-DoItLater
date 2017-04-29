@@ -80,46 +80,9 @@ public class ToDoListFragment extends ListFragment implements OnItemClickListene
         super.onCreate(savedInstanceState);
 
         // Create an array adapter for the list view, using the Ipsum headlines array
-        Activity act = getActivity();
+        MainActivity act = (MainActivity) getActivity();
 
-        String[] projection = {
-                ToDoContract.ToDoEntry._ID,
-                ToDoContract.ToDoEntry.COLUMN_NAME_TITLE,
-                ToDoContract.ToDoEntry.COLUMN_NAME_DATE
-        };
-
-        String sortOrder =
-                ToDoContract.ToDoEntry.COLUMN_NAME_DATE + " DESC";
-
-        SQLiteDatabase db = ((MainActivity) getActivity()).mDbHelper.getReadableDatabase();
-
-        Cursor cursor = db.query(
-                ToDoContract.ToDoEntry.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-
-        ArrayList<ToDoListItem> items = new ArrayList<>();
-
-        while(cursor.moveToNext()) {
-            long itemId = cursor.getLong(
-                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry._ID));
-            String itemTitle = cursor.getString(
-                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE));
-            String itemDate = cursor.getString(
-                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_DATE));
-
-            items.add(new ToDoListItem(itemId, itemTitle, itemDate));
-        }
-        cursor.close();
-
-        mListAdapter = new MyArrayAdapter(act, items);
-
-
+        mListAdapter = new MyArrayAdapter(act, act.mDbHelper.selectAll());
     }
 
     /**
@@ -147,14 +110,7 @@ public class ToDoListFragment extends ListFragment implements OnItemClickListene
         Log.d("long", "enter");
         Long index = (Long) view.getTag();
 
-        // Define 'where' part of query.
-        String selection = ToDoContract.ToDoEntry._ID + " = ?";
-        // Specify arguments in placeholder order.
-        String[] selectionArgs = { index.toString() };
-        // Issue SQL statement.
-        SQLiteDatabase db = ((MainActivity) getActivity()).mDbHelper.getWritableDatabase();
-
-        db.delete(ToDoContract.ToDoEntry.TABLE_NAME, selection, selectionArgs);
+        ((MainActivity) getActivity()).mDbHelper.delete(index);
 
         mListAdapter.removeView(position);
 

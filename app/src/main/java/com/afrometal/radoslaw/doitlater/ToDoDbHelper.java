@@ -2,8 +2,11 @@ package com.afrometal.radoslaw.doitlater;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
 
 /**
  * Created by radoslaw on 26.04.17.
@@ -65,5 +68,55 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
                 values,
                 selection,
                 selectionArgs);
+    }
+
+    public int delete(Long id) {
+        // Define 'where' part of query.
+        String selection = ToDoContract.ToDoEntry._ID + " = ?";
+        // Specify arguments in placeholder order.
+        String[] selectionArgs = { id.toString() };
+        // Issue SQL statement.
+        SQLiteDatabase db = getWritableDatabase();
+
+        return db.delete(ToDoContract.ToDoEntry.TABLE_NAME, selection, selectionArgs);
+    }
+
+    public ArrayList<ToDoListItem> selectAll() {
+        String[] projection = {
+                ToDoContract.ToDoEntry._ID,
+                ToDoContract.ToDoEntry.COLUMN_NAME_TITLE,
+                ToDoContract.ToDoEntry.COLUMN_NAME_DATE
+        };
+
+        String sortOrder =
+                ToDoContract.ToDoEntry.COLUMN_NAME_DATE + " DESC";
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(
+                ToDoContract.ToDoEntry.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        ArrayList<ToDoListItem> items = new ArrayList<>();
+
+        while(cursor.moveToNext()) {
+            long itemId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry._ID));
+            String itemTitle = cursor.getString(
+                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE));
+            String itemDate = cursor.getString(
+                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_DATE));
+
+            items.add(new ToDoListItem(itemId, itemTitle, itemDate));
+        }
+        cursor.close();
+
+        return items;
     }
 }
