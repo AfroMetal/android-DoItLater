@@ -21,7 +21,7 @@ public class DetailsFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.new_entry_view, container, false);
+        View mView = inflater.inflate(R.layout.details_view, container, false);
         mTitleTextView = (EditText)  mView.findViewById(R.id.title_textview);
         mDetailsTextView = (EditText) mView.findViewById(R.id.details_textview);
         mSaveButton = (Button) mView.findViewById(R.id.save_button);
