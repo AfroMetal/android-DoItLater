@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
             mToDoDueDate = due;
             mToDoDetails = details;
 
-            mToDoListFragment.mListAdapter.addView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), due.toString());
+            mToDoListFragment.mListAdapter.addView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), due);
             Toast.makeText(this, "Note '" + title + "' saved", Toast.LENGTH_SHORT).show();
         } else if (index >= 0) {
             int count = mDbHelper.update(index, title, details, due);
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
             mToDoDetails = details;
 
             if (count > 0) {
-                mToDoListFragment.mListAdapter.editView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), due.toString(), mAdapterPosition);
+                mToDoListFragment.mListAdapter.editView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), due, mAdapterPosition);
                 Toast.makeText(this, "Note '" + title + "' edited", Toast.LENGTH_SHORT).show();
             }
         } else {

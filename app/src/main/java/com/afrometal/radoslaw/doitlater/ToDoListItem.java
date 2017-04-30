@@ -8,9 +8,9 @@ public class ToDoListItem {
     Long id;
     String title;
     String date;
-    String due;
+    Long due;
 
-    public ToDoListItem(Long id, String title, String date, String due) {
+    public ToDoListItem(Long id, String title, String date, Long due) {
         this.id = id;
         this.title = title;
         this.date = date;

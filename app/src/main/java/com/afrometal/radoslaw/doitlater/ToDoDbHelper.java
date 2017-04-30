@@ -151,7 +151,7 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
                     cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE));
             String itemDate = cursor.getString(
                     cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_DATE));
-            String itemDue = cursor.getString(
+            Long itemDue = cursor.getLong(
                     cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_DUE));
 
             items.add(new ToDoListItem(itemId, itemTitle, itemDate, itemDue));
