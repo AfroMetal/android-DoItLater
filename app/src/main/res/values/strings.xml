@@ -2,4 +2,7 @@
     <string name="app_name">Do It Later</string>
     <string name="save">Save</string>
     <string name="pick_date">Deadline</string>
+    <string name="example">Example</string>
+    <string name="due_date_dummy">03 Mar 1995</string>
+    <string name="created_date_dummy">created: 12:00 03.03.1995</string>
 </resources>
