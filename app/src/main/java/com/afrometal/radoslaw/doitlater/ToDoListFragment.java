@@ -1,8 +1,5 @@
 package com.afrometal.radoslaw.doitlater;
 
-import android.app.Activity;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -13,13 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
+/**
+ * Created by radoslaw on 30.04.17.
+ */
 
 public class ToDoListFragment extends ListFragment implements OnItemClickListener, AdapterView.OnItemLongClickListener {
     // The list adapter for the list we are displaying

@@ -3,7 +3,7 @@ package com.afrometal.radoslaw.doitlater;
 import android.provider.BaseColumns;
 
 /**
- * Created by radoslaw on 26.04.17.
+ * Created by radoslaw on 30.04.17.
  */
 
 public final class ToDoContract {
@@ -17,5 +17,6 @@ public final class ToDoContract {
         public static final String COLUMN_NAME_TITLE = "title";
         public static final String COLUMN_NAME_DETAILS = "details";
         public static final String COLUMN_NAME_DATE = "date";
+        public static final String COLUMN_NAME_DUE = "due";
     }
 }

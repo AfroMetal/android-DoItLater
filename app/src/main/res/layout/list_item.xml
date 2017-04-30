@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/date"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="24dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
@@ -14,21 +14,36 @@
         android:maxLines="1"
         android:layout_alignWithParentIfMissing="true"
         android:gravity="center_vertical|right"
-        android:text="03.03.1995"
-        android:textColor="@color/colorAccent"
+        android:text="created: 12:00 03.03.1995"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="12sp" />
 
     <TextView
+        android:id="@+id/due"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:maxLines="1"
+        android:layout_alignWithParentIfMissing="true"
+        android:gravity="center_vertical|left"
+        android:text="03 Mar 1995"
+        android:ellipsize="marquee"
+        android:textColor="@color/colorAccent"
+        android:textSize="16dp" />
+
+    <TextView
         android:id="@+id/firstLine"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/date"
+        android:layout_above="@id/due"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignWithParentIfMissing="true"
         android:gravity="center_vertical"
-        android:text="Example application"
+        android:text="Example application asfsafa fsa fsaf asf fs"
+        android:maxLines="1"
+        android:ellipsize="marquee"
         android:textColor="@color/colorBlack"
         android:textSize="18sp" />
 

@@ -4,16 +4,16 @@ package com.afrometal.radoslaw.doitlater;
  * Created by radoslaw on 30.04.17.
  */
 
-public class ToDoListItem {
+public class ToDoDetailsItem {
     Long id;
     String title;
-    String date;
-    String due;
+    String details;
+    Long due;
 
-    public ToDoListItem(Long id, String title, String date, String due) {
+    public ToDoDetailsItem(Long id, String title, String details, Long due) {
         this.id = id;
         this.title = title;
-        this.date = date;
+        this.details = details;
         this.due = due;
     }
 }

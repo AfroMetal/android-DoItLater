@@ -1,22 +1,20 @@
 package com.afrometal.radoslaw.doitlater;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+/**
+ * Created by radoslaw on 30.04.17.
+ */
 
 public class MainActivity extends AppCompatActivity implements ToDoListFragment.OnToDoItemSelectedListener {
 
@@ -34,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
     Long mToDoIndex = -1L;
     String mToDoTitle = "";
     String mToDoDetails = "";
+    Long mToDoDueDate = System.currentTimeMillis();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,8 +60,12 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
                 @Override
                 public void onClick(View v) {
                     String title = mDetailsFragment.mTitleTextView.getText().toString();
+                    Long due = (Long) mDetailsFragment.mDueButton.getTag();
                     String details = mDetailsFragment.mDetailsTextView.getText().toString();
-                    saveData(mToDoIndex, title, details);
+
+                    if (!due.equals(mToDoDueDate) || !title.equals(mToDoTitle) || !details.equals(mToDoDetails)) {
+                        saveData(mToDoIndex, title, details, due);
+                    }
                 }
             });
             mDetailsFragment.mDetailsTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -71,8 +74,9 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
                     boolean handled = false;
                     if (actionId == EditorInfo.IME_ACTION_SEND) {
                         String title = mDetailsFragment.mTitleTextView.getText().toString();
+                        Long due = (Long) mDetailsFragment.mDueButton.getTag();
                         String details = mDetailsFragment.mDetailsTextView.getText().toString();
-                        saveData(mToDoIndex, title, details);
+                        saveData(mToDoIndex, title, details, due);
                     }
                     return handled;
                 }
@@ -91,20 +95,24 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
         if (savedInstanceState != null) {
             mToDoIndex = savedInstanceState.getLong("index", -1L);
             mToDoTitle = savedInstanceState.getString("title", "");
+            mToDoDueDate = savedInstanceState.getLong("due", System.currentTimeMillis());
             mToDoDetails = savedInstanceState.getString("details", "");
             mAdapterPosition = savedInstanceState.getInt("position");
 
-            if (mIsDualPane) {
-                // display it on the article fragment
-                mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDetails);
-            } else if (!mToDoTitle.isEmpty() && ! mToDoDetails.isEmpty()){
-                // use separate activity
-                Intent intent = new Intent(this, DetailsActivity.class);
-                intent.putExtra("itemIndex", mToDoIndex);
-                intent.putExtra("itemTitle", mToDoTitle);
-                intent.putExtra("itemDetails", mToDoDetails);
-                intent.putExtra("restored", true);
-                startActivityForResult(intent, 1);
+            if (!mToDoTitle.isEmpty() || !mToDoDetails.isEmpty()) {
+                if (mIsDualPane) {
+                    // display it on the article fragment
+                    mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDueDate, mToDoDetails);
+                } else {
+                    // use separate activity
+                    Intent intent = new Intent(this, DetailsActivity.class);
+                    intent.putExtra("itemIndex", mToDoIndex);
+                    intent.putExtra("itemTitle", mToDoTitle);
+                    intent.putExtra("itemDueDate", mToDoDueDate);
+                    intent.putExtra("itemDetails", mToDoDetails);
+                    intent.putExtra("restored", true);
+                    startActivityForResult(intent, 1);
+                }
             }
         }
     }
@@ -119,10 +127,12 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
     public void onSaveInstanceState(Bundle outState) {
         if (mIsDualPane) {
             mToDoTitle = mDetailsFragment.mTitleTextView.getText().toString();
+            mToDoDueDate = (Long) mDetailsFragment.mDueButton.getTag();
             mToDoDetails = mDetailsFragment.mDetailsTextView.getText().toString();
         }
         outState.putLong("index", mToDoIndex);
         outState.putString("title", mToDoTitle);
+        outState.putLong("due", mToDoDueDate);
         outState.putString("details", mToDoDetails);
         outState.putInt("position", mAdapterPosition);
         super.onSaveInstanceState(outState);
@@ -132,48 +142,25 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
     public void onToDoItemSelected(Long index, int position) {
         mAdapterPosition = position;
         mToDoIndex = index;
+        mToDoDueDate = System.currentTimeMillis();
         mToDoTitle = "";
         mToDoDetails = "";
         if (index >= 0) {
-            String[] projection = {
-                    ToDoContract.ToDoEntry._ID,
-                    ToDoContract.ToDoEntry.COLUMN_NAME_TITLE,
-                    ToDoContract.ToDoEntry.COLUMN_NAME_DETAILS
-            };
+            ToDoDetailsItem item = mDbHelper.selectDetails(index);
 
-            SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-            // Filter results WHERE "id" = index
-            String selection = ToDoContract.ToDoEntry._ID + " = ?";
-            String[] selectionArgs = { index.toString() };
-
-            Cursor cursor = db.query(
-                    ToDoContract.ToDoEntry.TABLE_NAME,        // The table to query
-                    projection,                               // The columns to return
-                    selection,                                // The columns for the WHERE clause
-                    selectionArgs,                            // The values for the WHERE clause
-                    null,                                     // don't group the rows
-                    null,                                     // don't filter by row groups
-                    null                                      // The sort order
-            );
-
-            cursor.moveToNext();
-
-            mToDoTitle = cursor.getString(
-                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_TITLE));
-            mToDoDetails = cursor.getString(
-                    cursor.getColumnIndexOrThrow(ToDoContract.ToDoEntry.COLUMN_NAME_DETAILS));
-
-            cursor.close();
+            mToDoTitle = item.title;
+            mToDoDueDate = item.due;
+            mToDoDetails = item.details;
         }
         if (mIsDualPane) {
             // display it on the article fragment
-            mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDetails);
+            mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDueDate, mToDoDetails);
         } else {
             // use separate activity
             Intent intent = new Intent(this, DetailsActivity.class);
             intent.putExtra("itemIndex", mToDoIndex);
             intent.putExtra("itemTitle", mToDoTitle);
+            intent.putExtra("itemDueDate", mToDoDueDate);
             intent.putExtra("itemDetails", mToDoDetails);
             startActivityForResult(intent, 1);
         }
@@ -186,43 +173,48 @@ public class MainActivity extends AppCompatActivity implements ToDoListFragment.
             if (resultCode == RESULT_OK || resultCode == RESULT_FIRST_USER + 0) {
                 mToDoIndex = data.getLongExtra("itemIndex", -2);
                 mToDoTitle = data.getStringExtra("itemTitle");
+                mToDoTitle = mToDoTitle == null ? "" : mToDoTitle;
+                mToDoDueDate = data.getLongExtra("itemDueDate", System.currentTimeMillis());
                 mToDoDetails = data.getStringExtra("itemDetails");
+                mToDoDetails = mToDoDetails == null ? "" : mToDoDetails;
 
                 if (resultCode == RESULT_OK) {
-                    saveData(mToDoIndex, mToDoTitle, mToDoDetails);
+                    saveData(mToDoIndex, mToDoTitle, mToDoDetails, mToDoDueDate);
                 } else {
-                    mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDetails);
+                    mDetailsFragment.updateDetailsView(mToDoTitle, mToDoDueDate, mToDoDetails);
                 }
             }
         }
     }
 
-    public void saveData(Long index, String title, String details) {
+    public void saveData(Long index, String title, String details, Long due) {
         if (title.isEmpty() && details.isEmpty()) {
             return;
         } else if (title.isEmpty()) {
             title = details.split(" ", 2)[0];
         }
         if (index == -1) {
-            mToDoIndex = mDbHelper.insert(title, details);
+            mToDoIndex = mDbHelper.insert(title, details, due);
             mToDoTitle = title;
+            mToDoDueDate = due;
             mToDoDetails = details;
 
-            mToDoListFragment.mListAdapter.addView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString());
+            mToDoListFragment.mListAdapter.addView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), due.toString());
             Toast.makeText(this, "Note '" + title + "' saved", Toast.LENGTH_SHORT).show();
         } else if (index >= 0) {
-            int count = mDbHelper.update(index, title, details);
+            int count = mDbHelper.update(index, title, details, due);
 
             mToDoIndex = index;
             mToDoTitle = title;
+            mToDoDueDate = due;
             mToDoDetails = details;
 
             if (count > 0) {
-                mToDoListFragment.mListAdapter.editView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), mAdapterPosition);
+                mToDoListFragment.mListAdapter.editView(mToDoIndex, mToDoTitle, ((Long) System.currentTimeMillis()).toString(), due.toString(), mAdapterPosition);
                 Toast.makeText(this, "Note '" + title + "' edited", Toast.LENGTH_SHORT).show();
             }
         } else {
-            mDetailsFragment.updateDetailsView("", "");
+            mDetailsFragment.updateDetailsView("", System.currentTimeMillis(), "");
             return;
         }
 

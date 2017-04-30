@@ -12,17 +12,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Created by radoslaw on 06.04.17.
+ * Created by radoslaw on 30.04.17.
  */
 
 public class DetailsActivity extends AppCompatActivity {
     // The fragment where the article is displayed (null if absent)
-    private DetailsFragment mDetailsFragment;
+    protected DetailsFragment mDetailsFragment;
     // The news category index and the article index for the article we are to display
-    private Long mToDoIndex;
-    private String mTitle;
-    private String mDetails;
-    private Boolean mRestored;
+    protected Long mToDoIndex;
+    protected String mTitle;
+    protected Long mDueDate;
+    protected String mDetails;
+    protected Boolean mRestored;
 
     /**
      * Sets up the activity.
@@ -47,6 +48,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         mToDoIndex = args.getLong("itemIndex");
         mTitle = args.getString("itemTitle");
+        mDueDate = args.getLong("itemDueDate");
         mDetails = args.getString("itemDetails");
         mRestored = args.getBoolean("restored", false);
 
@@ -64,7 +66,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
-        mDetailsFragment.updateDetailsView(mTitle, mDetails);
+        mDetailsFragment.updateDetailsView(mTitle, mDueDate, mDetails);
     }
 
     @Override
@@ -72,6 +74,7 @@ public class DetailsActivity extends AppCompatActivity {
         Intent intent = new Intent((String) null);
         intent.putExtra("itemIndex", mToDoIndex);
         intent.putExtra("itemTitle", mDetailsFragment.mTitleTextView.getText().toString());
+        intent.putExtra("itemDueDate", (Long) mDetailsFragment.mDueButton.getTag());
         intent.putExtra("itemDetails", mDetailsFragment.mDetailsTextView.getText().toString());
         setResult(RESULT_FIRST_USER + 0, intent);
         finish();
@@ -97,14 +100,16 @@ public class DetailsActivity extends AppCompatActivity {
 
     private void sendResult() {
         String title = mDetailsFragment.mTitleTextView.getText().toString();
+        Long due = (Long) mDetailsFragment.mDueButton.getTag();
         String details = mDetailsFragment.mDetailsTextView.getText().toString();
 
         Intent intent = new Intent((String) null);
         intent.putExtra("itemIndex", mToDoIndex);
         intent.putExtra("itemTitle", title);
+        intent.putExtra("itemDueDate", due);
         intent.putExtra("itemDetails", details);
 
-        if (title.equals(mTitle) && details.equals(mDetails) && !mRestored) {
+        if (due.equals(mDueDate) && title.equals(mTitle) && details.equals(mDetails) && !mRestored) {
             setResult(RESULT_CANCELED, intent);
         } else {
             setResult(RESULT_OK, intent);

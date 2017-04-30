@@ -2,4 +2,5 @@
     <string name="app_name">Do It Later</string>
     <string name="ratingData">ratingForBike</string>
     <string name="save">Save</string>
+    <string name="pick_date">Deadline</string>
 </resources>
