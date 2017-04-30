@@ -3,9 +3,6 @@
     <color name="colorPrimary">#673ab7</color>
     <color name="colorPrimaryDark">#512da8</color>
     <color name="colorAccent">#009688</color>
-    <color name="colorAccentDark">#00695c</color>
-    <color name="whiteTitle">#eeeeee</color>
-    <color name="transparent">#55000000</color>
     <color name="colorBlack">#111111</color>
     <color name="colorOver">#d50000</color>
     <color name="colorSoon">#f57f17</color>
