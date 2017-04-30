@@ -62,8 +62,7 @@ public class MyArrayAdapter extends ArrayAdapter<ToDoListItem> {
             dueView.setTypeface(null, Typeface.BOLD);
             dueView.setTextColor(context.getResources().getColor(R.color.colorOver, null));
         } else if (calendar.getTimeInMillis() >= due) {
-            dueView.setTypeface(null, Typeface.BOLD);
-            dueView.setTextColor(context.getResources().getColor(R.color.colorSoon, null));
+            dueView.setTextColor(context.getResources().getColor(R.color.colorOver, null));
         }
 
         return rowView;
